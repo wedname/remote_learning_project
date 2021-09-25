@@ -1,8 +1,30 @@
 from django.contrib import admin
-from .models import Groups, Students, Subjects, Teachers, SubjectsTeachers, Schedule, Tasks, Grades, StudentsAnswers, User
+from django.contrib.auth.admin import UserAdmin as OrigUserAdmin
+
+from .models import (
+    Groups,
+    Students,
+    Subjects,
+    Teachers,
+    SubjectsTeachers,
+    Schedule,
+    Tasks,
+    Grades,
+    StudentsAnswers,
+    User
+)
 
 
-admin.site.register(User)
+@admin.register(User)
+class CustomUserAdmin(OrigUserAdmin):
+    exclude = ('first_name', 'last_name')
+    fieldsets = (
+        ('Персональная информация', {'fields': ('fio', 'email', 'password')}),
+        ('Важные даты', {'fields': ('last_login', 'date_joined')}),
+        ('Разрешения', {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
+    )
+
+
 admin.site.register(Groups)
 admin.site.register(Students)
 admin.site.register(Subjects)
