@@ -1,10 +1,15 @@
 from django.db import models
 from datetime import date, datetime
 from django.core.validators import MaxValueValidator, MinValueValidator
-from django.contrib.auth import get_user_model
+from django.contrib.auth.models import AbstractUser
 
 
-User = get_user_model()
+class User(AbstractUser):
+    """Пользователи"""
+    first_name = None
+    last_name = None
+    fio = models.CharField(verbose_name='ФИО', max_length=255)
+    REQUIRED_FIELDS = ['fio']
 
 
 class Groups(models.Model):
@@ -21,11 +26,11 @@ class Groups(models.Model):
 
 class Students(models.Model):
     """Ученики"""
-    user = models.ForeignKey(User, verbose_name='Ученик', on_delete=models.CASCADE)
+    credentials = models.OneToOneField(User, verbose_name='Ученик', related_name='student', on_delete=models.CASCADE)
     group = models.ForeignKey(Groups, verbose_name='Класс', on_delete=models.CASCADE)
 
     def __str__(self):
-        return f"Ученик: {self.user.first_name} {self.user.last_name}, класс: {self.group.name}"
+        return f"Ученик: {self.credentials.fio}, класс: {self.group.name}"
 
     class Meta:
         verbose_name = "Ученик"
@@ -46,12 +51,12 @@ class Subjects(models.Model):
 
 class Teachers(models.Model):
     """Преподаватели"""
-    user = models.ForeignKey(User, verbose_name='Преподаватель', on_delete=models.CASCADE)
+    credentials = models.OneToOneField(User, verbose_name='Ученик', related_name='teacher', on_delete=models.CASCADE)
     subject = models.ManyToManyField(Subjects, blank=True, verbose_name='Записи на туры',
                                      related_name='teacher_subject', through="SubjectsTeachers")
 
     def __str__(self):
-        return f"Преподаватель: {self.user.first_name} {self.user.last_name}"
+        return f"Преподаватель: {self.credentials.fio}"
 
     class Meta:
         verbose_name = "Преподаватель"
@@ -64,7 +69,7 @@ class SubjectsTeachers(models.Model):
     teacher = models.ForeignKey(Teachers, verbose_name='Преподаватель', on_delete=models.CASCADE)
 
     def __str__(self):
-        return f"{self.subject.subject_name} - {self.teacher.user.first_name} {self.teacher.user.last_name}"
+        return f"{self.subject.subject_name} - {self.teacher.credentials.fio}"
 
     class Meta:
         verbose_name = "Учителя и их предметы"
@@ -121,7 +126,7 @@ class Grades(models.Model):
         ])
 
     def __str__(self):
-        return f'{self.student.user.first_name} {self.student.user.last_name} | {self.subject_teacher.subject} | ' \
+        return f'{self.student.credentials.fio} | {self.subject_teacher.subject} | ' \
                f'{self.grade} | {self.date}'
 
     class Meta:
@@ -137,7 +142,7 @@ class StudentsAnswers(models.Model):
     grade = models.ForeignKey(Grades, verbose_name="Оценка", on_delete=models.CASCADE)
 
     def __str__(self):
-        return f'{self.student.user.first_name} {self.student.user.last_name}| {self.task.subject_teacher.subject} | ' \
+        return f'{self.student.credentials.fio} | {self.task.subject_teacher.subject} | ' \
                f'{self.task.date}'
 
     class Meta:
