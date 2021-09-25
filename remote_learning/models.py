@@ -9,6 +9,9 @@ class User(AbstractUser):
     first_name = None
     last_name = None
     fio = models.CharField(verbose_name='ФИО', max_length=255)
+    is_teacher = models.BooleanField(default=False, verbose_name="Учитель")
+    is_student = models.BooleanField(default=False, verbose_name="Ученик")
+    is_active = models.BooleanField(default=True)
     REQUIRED_FIELDS = ['fio']
 
 
@@ -52,7 +55,7 @@ class Subjects(models.Model):
 
 class Teachers(models.Model):
     """Преподаватели"""
-    credentials = models.OneToOneField(User, verbose_name='Ученик', related_name='teacher', on_delete=models.CASCADE)
+    credentials = models.OneToOneField(User, verbose_name='Преподаватель', related_name='teacher', on_delete=models.CASCADE)
     subject = models.ManyToManyField(Subjects, blank=True, verbose_name='Записи на туры',
                                      related_name='teacher_subject', through="SubjectsTeachers")
 

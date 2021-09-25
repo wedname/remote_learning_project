@@ -21,7 +21,7 @@ class CustomUserAdmin(OrigUserAdmin):
     fieldsets = (
         ('Персональная информация', {'fields': ('fio', 'email', 'password')}),
         ('Важные даты', {'fields': ('last_login', 'date_joined')}),
-        ('Разрешения', {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
+        ('Разрешения', {'fields': ('is_active', 'is_teacher', 'is_student')}),
     )
 
 
